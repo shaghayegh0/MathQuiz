@@ -21,7 +21,7 @@ function App() {
         const algebra = data.algebra;
         const calculus = data.calculus;
         // Add the questions together and shuffle them
-        setQuestions(calculus.concat(algebra).sort(() => 0.5 - Math.random()));
+        setQuestions(calculus.concat(algebra ).sort(() => 0.5 - Math.random()));
       })
       .catch((error) => console.error(error));
   }, []);
@@ -41,11 +41,10 @@ function App() {
   const handleNextButtonClick = () => {
     setCount(count + 1);
     update(selectedAnswer);
-    console.log("visitedQuestions:", visitedQuestions.length);
     if (visitedQuestions.length < 10) {
       // Push the current question to the visitedQuestions array
-      setVisitedQuestions([...visitedQuestions, currentQuestion]);
-      console.log("visitedQuestions:", visitedQuestions.length);
+      setVisitedQuestions(previouslyVisitedQuestions => [...previouslyVisitedQuestions, currentQuestion]);
+      console.log("visitedQuestions:", visitedQuestions);
 
       // Find the next question
       const nextQuestion = questions.find((question) => {
@@ -73,15 +72,18 @@ function App() {
       // If the current question is level 5, then the next question must be level 5 and not visited.
       // Else, the next question must be the current level + 1 and not visited.
       if (currentLevel === 5) {
-        return potentialQuestionLevel === 5 && !visitedQuestions.includes(question);
+        
+        console.log("visitedQuestions:", visitedQuestions);
+        console.log("question:", question.q);
+        return potentialQuestionLevel === 5 && !visitedQuestions.map((q) => q.q).includes(question.q);
       } else {
-        return potentialQuestionLevel === currentLevel + 1 && !visitedQuestions.includes(question);
+        return potentialQuestionLevel === currentLevel + 1  && !visitedQuestions.includes(question);
       }
     } else {
       // If the current question is level 1, then the next question must be level 1 and not visited.
       // Else, the next question must be the previous level and not visited.
       if (currentLevel === 1) {
-        return potentialQuestionLevel === 1 && !visitedQuestions.includes(question);
+        return potentialQuestionLevel === 1 && !visitedQuestions.map((q) => q.q).includes(question.q);
       } else {
         return potentialQuestionLevel === currentLevel - 1 && !visitedQuestions.includes(question);
       }
@@ -106,6 +108,7 @@ function App() {
     setTotalPoints(0);
     setCount(0);
     setShowPoints(false);
+    window.location.reload();
   };
 
   if (showPoints) {
