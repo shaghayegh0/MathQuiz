@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from "react";
+import { useRef } from 'react';
 import "./App.css";
 
 function App() {
-  const [questions, setQuestions] = useState([]);
+  // useState is a hook to store state across renders,
+  // and trigger a re-render of the component when the state changes
   const [currentQuestion, setCurrentQuestion] = useState({});
-  const [visitedQuestions, setVisitedQuestions] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState({});
   const [points, setPoints] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
   const [count, setCount] = useState(0);
   const [showPoints, setShowPoints] = useState(false);
   const [userAnswer, setUserAnswer] = useState(false);
+
+  // - useRef is a hook to store state across renders, 
+  // but not trigger a re-render of the component.
+  // - Since questions and visitedQuestions are not used in the render,
+  // we can use useRef instead of useState.
+  // - Using useState would mean anything that's dependent on questions or visitedQuestions,
+  // would re-render when questions or visitedQuestions changes.
+  const questions = useRef([]);
+  const visitedQuestions = useRef([]);
 
   // Fetch questions from database and parse them
   useEffect(() => {
@@ -21,17 +31,14 @@ function App() {
         const algebra = data.algebra;
         const calculus = data.calculus;
         // Add the questions together and shuffle them
-        setQuestions(calculus.concat(algebra ).sort(() => 0.5 - Math.random()));
+        questions.current = calculus.concat(algebra).sort(() => 0.5 - Math.random());
+        // Find the first question
+        const firstQuestion = questions.current.find((question) => question.level === 1);
+        setCurrentQuestion(firstQuestion);
+        visitedQuestions.current = [firstQuestion];
       })
       .catch((error) => console.error(error));
   }, []);
-
-  // Get the first question with a useEffect hook
-  useEffect(() => {
-    setCurrentQuestion(
-      questions.find((question) => question.level === 1)
-    );
-  }, [questions]);
 
   const handleAnswerChange = (event) => {
     setSelectedAnswer(event.target.value);
@@ -41,17 +48,15 @@ function App() {
   const handleNextButtonClick = () => {
     setCount(count + 1);
     update(selectedAnswer);
-    if (visitedQuestions.length < 10) {
-      // Push the current question to the visitedQuestions array
-      setVisitedQuestions(previouslyVisitedQuestions => [...previouslyVisitedQuestions, currentQuestion]);
-      console.log("visitedQuestions:", visitedQuestions);
-
+    if (visitedQuestions.current.length < 10) {
       // Find the next question
-      const nextQuestion = questions.find((question) => {
+      const nextQuestion = questions.current.find((question) => {
         return safelyCheckLevel(selectedAnswer, question)
       })
 
       // Set the next question and reset the selected answer
+      // Push the next question to the visitedQuestions array to check later in safelyCheckLevel
+      visitedQuestions.current.push(nextQuestion);
       setCurrentQuestion(nextQuestion);
       setSelectedAnswer({});
     } else {
@@ -68,24 +73,24 @@ function App() {
     const currentLevel = currentQuestion.level;
     const potentialQuestionLevel = question.level;
 
+    // If the user got the answer correct
     if (selectedAnswer === currentQuestion.a) {
       // If the current question is level 5, then the next question must be level 5 and not visited.
       // Else, the next question must be the current level + 1 and not visited.
       if (currentLevel === 5) {
-        
-        console.log("visitedQuestions:", visitedQuestions);
-        console.log("question:", question.q);
-        return potentialQuestionLevel === 5 && !visitedQuestions.map((q) => q.q).includes(question.q);
+        return potentialQuestionLevel === 5 && !visitedQuestions.current.includes(question);
       } else {
-        return potentialQuestionLevel === currentLevel + 1  && !visitedQuestions.includes(question);
+        // Next question can be either the current level, or the next level
+        return (potentialQuestionLevel === currentLevel + 1 || potentialQuestionLevel === currentLevel)  && !visitedQuestions.current.includes(question);
       }
     } else {
       // If the current question is level 1, then the next question must be level 1 and not visited.
       // Else, the next question must be the previous level and not visited.
       if (currentLevel === 1) {
-        return potentialQuestionLevel === 1 && !visitedQuestions.map((q) => q.q).includes(question.q);
+        return potentialQuestionLevel === 1 && !visitedQuestions.current.map((q) => q.q).includes(question.q);
       } else {
-        return potentialQuestionLevel === currentLevel - 1 && !visitedQuestions.includes(question);
+        // Next question can be either the current level, or the previous level
+        return (potentialQuestionLevel === currentLevel - 1 || potentialQuestionLevel === currentLevel) && !visitedQuestions.current.includes(question);
       }
     }
   }
@@ -103,7 +108,7 @@ function App() {
 
   // Reset the quiz
   const handlePlayAgainClick = () => {
-    setVisitedQuestions([]);
+    visitedQuestions.current = [];
     setPoints(0);
     setTotalPoints(0);
     setCount(0);
@@ -124,7 +129,7 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {visitedQuestions.map((q) => (
+            {visitedQuestions.current.map((q) => (
               <tr key={q.q}>
                 <td>{q.topic}</td>
                 <td>{q.level}</td>
