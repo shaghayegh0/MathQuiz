@@ -20,8 +20,9 @@ function App() {
         // Grab the questions from the database
         const algebra = data.algebra;
         const calculus = data.calculus;
+        const geometry = data.geometry
         // Add the questions together and shuffle them
-        setQuestions(calculus.concat(algebra).sort(() => 0.5 - Math.random()));
+        setQuestions(calculus.concat(algebra , geometry).sort(() => 0.5 - Math.random()));
       })
       .catch((error) => console.error(error));
   }, []);
