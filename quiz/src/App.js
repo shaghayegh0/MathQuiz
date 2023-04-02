@@ -87,7 +87,7 @@ function App() {
       // If the current question is level 1, then the next question must be level 1 and not visited.
       // Else, the next question must be the previous level and not visited.
       if (currentLevel === 1) {
-        return potentialQuestionLevel === 1 && !visitedQuestions.current.map((q) => q.q).includes(question.q);
+        return potentialQuestionLevel === 1 && !visitedQuestions.current.includes(question);
       } else {
         // Next question can be either the current level, or the previous level
         return (potentialQuestionLevel === currentLevel - 1 || potentialQuestionLevel === currentLevel) && !visitedQuestions.current.includes(question);
