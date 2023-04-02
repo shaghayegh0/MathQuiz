@@ -360,5 +360,79 @@
             "1 or -2"
          ]
       }
+   ],
+   "calculus":[
+      {
+         "level":1,
+         "topic":"calculus",
+         "q":"What is the derivative of 5x^2 with respect to x?",
+         "a":"10x",
+         "answers":[
+            "10x",
+            "5x",
+            "2x",
+            "25x^2"
+         ]
+      },
+      {
+         "level":1,
+         "topic":"calculus",
+         "q":"What is the integral of 3x^2 with respect to x?",
+         "a":"x^3 + C",
+         "answers":[
+            "x^3 + C",
+            "3x^2",
+            "2x^2",
+            "x^2 + C"
+         ]
+      },
+      {
+         "level":1,
+         "topic":"calculus",
+         "q":"What is the limit of (x^2 - 4) / (x - 2) as x approaches 2?",
+         "a":"4",
+         "answers":[
+            "4",
+            "0",
+            "2",
+            "Undefined"
+         ]
+      },
+      {
+         "level":1,
+         "topic":"calculus",
+         "q":"What is the derivative of sin(x) with respect to x?",
+         "a":"cos(x)",
+         "answers":[
+            "cos(x)",
+            "sin(x)",
+            "tan(x)",
+            "-sin(x)"
+         ]
+      },
+      {
+         "level":1,
+         "topic":"calculus",
+         "q":"What is the integral of e^x with respect to x?",
+         "a":"e^x + C",
+         "answers":[
+            "e^x + C",
+            "2e^x",
+            "x^2",
+            "ln(x) + C"
+         ]
+      },
+      {
+         "level":1,
+         "topic":"calculus",
+         "q":"What is the second derivative of f(x) = 2x^3 - 6x + 1?",
+         "a":"12x",
+         "answers":[
+            "12x",
+            "6x^2 - 6",
+            "6x",
+            "2x^2 - 6"
+         ]
+      }
    ]
 }

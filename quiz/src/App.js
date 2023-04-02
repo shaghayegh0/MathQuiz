@@ -5,37 +5,30 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState({});
   const [visitedQuestions, setVisitedQuestions] = useState([]);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [selectedAnswer, setSelectedAnswer] = useState({});
   const [points, setPoints] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
   const [count, setCount] = useState(0);
   const [showPoints, setShowPoints] = useState(false);
   const [userAnswer , setUserAnswer] = useState(false);
 
+  // Fetch questions from database and parse them
   useEffect(() => {
     fetch("/Database.json")
       .then((response) => response.json())
       .then((data) => {
-        if (!Array.isArray(data)) {
-          data = [data];
-        }
-        var result = {};
-        data.forEach((question) => {
-          result = question;
-        });
-        setQuestions(result.algebra);
-        console.log(result.algebra);
+        setQuestions(data.algebra);
       })
       .catch((error) => console.error(error));
   }, []);
 
+  // Set the current question with a useEffect hook
   useEffect(() => {
     setCurrentQuestion(
       questions
-        .filter(
-          (question) =>
-            question.level === 1 && !visitedQuestions.includes(question)
-        )
+        .filter((question) => {
+            return question.level === 1 && !visitedQuestions.includes(question)
+        })
         .sort(() => 0.5 - Math.random())
         .slice(0, 1)[0]
     );
@@ -49,20 +42,13 @@ function App() {
     setCount(count + 1);
     update(selectedAnswer);
     if (visitedQuestions.length < 10) {
-      const nextQuestion = questions
-        .filter(
-          (question) =>
-            (selectedAnswer === currentQuestion.a &&
-              question.level >= currentQuestion.level &&
-              !visitedQuestions.includes(question)) ||
-            (selectedAnswer !== currentQuestion.a &&
-              question.level <= currentQuestion.level &&
-              !visitedQuestions.includes(question))
-        )
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 1)[0];
-      setCurrentQuestion(nextQuestion);
       setVisitedQuestions([...visitedQuestions, currentQuestion]);
+
+      const nextQuestion = questions.find((question) => {
+          return safelyCheckLevel(selectedAnswer, question)
+      })
+
+      setCurrentQuestion(nextQuestion);
       setSelectedAnswer("");
     } else {
       // quiz is done
@@ -70,6 +56,25 @@ function App() {
       setShowPoints(true);
     }
   };
+
+  function safelyCheckLevel(selectedAnswer, question) {
+    console.log(visitedQuestions);
+
+    if (selectedAnswer === currentQuestion.a) {
+      if (currentQuestion.level === 5) {
+        console.log(visitedQuestions);
+        return question.level === 5 && !visitedQuestions.includes(question);
+      } else {
+        return question.level === currentQuestion.level + 1 && !visitedQuestions.includes(question);
+      }
+    } else {
+      if (currentQuestion.level === 1) {
+        return question.level === 1 && !visitedQuestions.includes(question);
+      } else {
+        return question.level === currentQuestion.level - 1 && !visitedQuestions.includes(question);
+      }
+    }
+  }
 
   const update = (answer) => {
     setTotalPoints(totalPoints + currentQuestion.level);
@@ -126,6 +131,7 @@ function App() {
       <p>Question {count} out of 10</p>
       {currentQuestion && (
         <div key={currentQuestion.q}>
+          <p>{currentQuestion.a}</p>
           <h2 class='ques'>
             Q:{currentQuestion.q} (level: {currentQuestion.level})
           </h2>
