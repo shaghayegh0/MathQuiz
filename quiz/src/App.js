@@ -11,7 +11,7 @@ function App() {
   const [totalPoints, setTotalPoints] = useState(0);
   const [count, setCount] = useState(0);
   const [showPoints, setShowPoints] = useState(false);
-  const [userAnswer, setUserAnswer] = useState(false);
+  
 
   // - useRef is a hook to store state across renders, 
   // but not trigger a re-render of the component.
@@ -21,6 +21,7 @@ function App() {
   // would re-render when questions or visitedQuestions changes.
   const questions = useRef([]);
   const visitedQuestions = useRef([]);
+  const useranswers = useRef([]);
 
   // Fetch questions from database and parse them
   useEffect(() => {
@@ -30,8 +31,9 @@ function App() {
         // Grab the questions from the database
         const algebra = data.algebra;
         const calculus = data.calculus;
+        const geometry = data.geometry;
         // Add the questions together and shuffle them
-        questions.current = calculus.concat(algebra).sort(() => 0.5 - Math.random());
+        questions.current = calculus.concat(algebra , geometry).sort(() => 0.5 - Math.random());
         // Find the first question
         const firstQuestion = questions.current.find((question) => question.level === 1);
         setCurrentQuestion(firstQuestion);
@@ -48,7 +50,7 @@ function App() {
   const handleNextButtonClick = () => {
     setCount(count + 1);
     update(selectedAnswer);
-    if (visitedQuestions.current.length < 10) {
+    if (visitedQuestions.current.length < 15) {
       // Find the next question
       const nextQuestion = questions.current.find((question) => {
         return safelyCheckLevel(selectedAnswer, question)
@@ -98,9 +100,10 @@ function App() {
   const update = (answer) => {
     setTotalPoints(totalPoints + currentQuestion.level);
     if (answer === currentQuestion.a) {
-      setUserAnswer(true);
+      useranswers.current.push(true);
       setPoints(points + currentQuestion.level);
     } else {
+      useranswers.current.push(false);
       setPoints(points + 0);
     }
     console.log("Updating with answer:", answer);
@@ -129,11 +132,11 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {visitedQuestions.current.map((q) => (
+            {visitedQuestions.current.map((q , index) => (
               <tr key={q.q}>
                 <td>{q.topic}</td>
                 <td>{q.level}</td>
-                <td>{userAnswer ? "Correct" : "Wrong"}</td>
+                <td>{useranswers.current[index] ? "Correct" : "Wrong"}</td>
               </tr>
             ))}
           </tbody>
