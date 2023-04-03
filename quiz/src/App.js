@@ -135,7 +135,7 @@ function App() {
   if (showPoints) {
     return (
       <ResultsTable
-      visitedQuestions={visitedQuestions.current}
+        visitedQuestions={visitedQuestions.current}
         userAnswers={useranswers.current}
         userPoints={points}
         totalPoints={totalPoints}
