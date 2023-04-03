@@ -12,7 +12,7 @@ function App() {
   const [totalPoints, setTotalPoints] = useState(0);
   const [count, setCount] = useState(0);
   const [showPoints, setShowPoints] = useState(false);
-  const [userAnswer, setUserAnswer] = useState(false);
+  
 
   // - useRef is a hook to store state across renders, 
   // but not trigger a re-render of the component.
@@ -22,6 +22,7 @@ function App() {
   // would re-render when questions or visitedQuestions changes.
   const questions = useRef([]);
   const visitedQuestions = useRef([]);
+  const useranswers = useRef([]);
 
   // Fetch questions from database and parse them
   useEffect(() => {
@@ -32,8 +33,9 @@ function App() {
         // Randomize the order of the answers each time the page loads
         const algebra = randomizeAnswersOrder(data.algebra);
         const calculus = randomizeAnswersOrder(data.calculus);
+        const geometry = randomizeAnswersOrder(data.geometry);
         // Add the questions together and shuffle them
-        questions.current = calculus.concat(algebra).sort(() => 0.5 - Math.random());
+        questions.current = calculus.concat(algebra, geometry).sort(() => 0.5 - Math.random());
         // Find the first question and set it as the current question
         const firstQuestion = questions.current.find((question) => question.level === 1);
         setCurrentQuestion(firstQuestion);
@@ -60,7 +62,7 @@ function App() {
   const handleNextButtonClick = () => {
     setCount(count + 1);
     update(selectedAnswer);
-    if (visitedQuestions.current.length < 10) {
+    if (visitedQuestions.current.length < 15) {
       // Find the next question
       const nextQuestion = questions.current.find((question) => {
         return safelyCheckLevel(selectedAnswer, question)
@@ -116,9 +118,10 @@ function App() {
   const update = (answer) => {
     setTotalPoints(totalPoints + currentQuestion.level);
     if (answer === currentQuestion.a) {
-      setUserAnswer(true);
+      useranswers.current.push(true);
       setPoints(points + currentQuestion.level);
     } else {
+      useranswers.current.push(false);
       setPoints(points + 0);
     }
     console.log("Updating with answer:", answer);
@@ -132,8 +135,8 @@ function App() {
   if (showPoints) {
     return (
       <ResultsTable
-        questions={visitedQuestions.current}
-        userAnswer={userAnswer}
+      visitedQuestions={visitedQuestions.current}
+        userAnswers={useranswers.current}
         userPoints={points}
         totalPoints={totalPoints}
         handlePlayAgainClick={handlePlayAgainClick} />
