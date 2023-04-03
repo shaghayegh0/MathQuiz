@@ -15,5 +15,5 @@
 - Once the app is running, the first question is displayed.
 - Select an answer to the question.
 - Click the "Next" button to proceed to the next question.
-- After 10 questions, the user's score is displayed along with the correct and incorrect answers.
+- After 15 questions, the user's score is displayed along with the correct and incorrect answers.
 - Click "Play Again" to take the quiz again.
