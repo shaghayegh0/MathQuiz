@@ -433,6 +433,80 @@
             "6x",
             "2x^2 - 6"
          ]
+      },
+      {
+      "level": 2,
+      "topic": "calculus",
+      "q": "What is the limit of (2x^2 + 3x - 2) / (x - 1) as x approaches 1?",
+      "a": "7",
+      "answers": [
+      "7",
+      "5",
+      "3",
+      "Undefined"
+      ]
+      },
+      {
+      "level": 2,
+      "topic": "calculus",
+      "q": "What is the derivative of ln(x) with respect to x?",
+      "a": "1/x",
+      "answers": [
+      "1/x",
+      "x",
+      "e^x",
+      "0"
+      ]
+      },
+      {
+      "level": 2,
+      "topic": "calculus",
+      "q": "What is the integral of 1 / (1 + x^2) with respect to x?",
+      "a": "arctan(x) + C",
+      "answers": [
+      "arctan(x) + C",
+      "ln(x) + C",
+      "cos(x) + C",
+      "sin(x) + C"
+      ]
+      },
+      {
+      "level": 2,
+      "topic": "calculus",
+      "q": "What is the limit of (e^x - 1) / x as x approaches 0?",
+      "a": "1",
+      "answers": [
+      "1",
+      "0",
+      "e",
+      "Undefined"
+      ]
+      },
+      {
+      "level": 2,
+      "topic": "calculus",
+      "q": "What is the second derivative of f(x) = x^4 - 3x^3 + 2x^2 - x + 1?",
+      "a": "12x - 18",
+      "answers": [
+      "12x - 18",
+      "6x^2 - 6x + 2",
+      "4x^3 - 9x^2 + 4x - 1",
+      "2x^2 - 3x"
+      ]
+      },
+      {
+      "level": 2,
+      "topic": "calculus",
+      "q": "What is the area between the curve y = x^2 and the x-axis from x = 0 to x = 2?",
+      "a": "8/3",
+      "answers": [
+      "8/3",
+      "4/3",
+      "2/3",
+      "10/3"
+      ]
       }
+      
+      
    ]
 }
