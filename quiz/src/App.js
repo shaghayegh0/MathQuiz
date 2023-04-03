@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
+import ResultsTable from "./ResultsTable";
+import QuizQuestion from "./QuizQuestion"
 
 function App() {
   // useState is a hook to store state across renders,
@@ -29,18 +30,29 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         // Grab the questions from the database
-        const algebra = data.algebra;
-        const calculus = data.calculus;
-        const geometry = data.geometry;
+        // Randomize the order of the answers each time the page loads
+        const algebra = randomizeAnswersOrder(data.algebra);
+        const calculus = randomizeAnswersOrder(data.calculus);
+        const geometry = randomizeAnswersOrder(data.geometry);
         // Add the questions together and shuffle them
-        questions.current = calculus.concat(algebra , geometry).sort(() => 0.5 - Math.random());
-        // Find the first question
+        questions.current = calculus.concat(algebra, geometry).sort(() => 0.5 - Math.random());
+        // Find the first question and set it as the current question
         const firstQuestion = questions.current.find((question) => question.level === 1);
         setCurrentQuestion(firstQuestion);
+        // Add the first question to the visitedQuestions array
         visitedQuestions.current = [firstQuestion];
       })
       .catch((error) => console.error(error));
   }, []);
+
+  // Randomize the order of the answers of every question in [questions]
+  // Returns a new array of questions with randomized answers
+  function randomizeAnswersOrder(questions) {
+    return questions.map((question) => {
+      question.answers.sort(() => 0.5 - Math.random());
+      return question
+    });
+  }
 
   const handleAnswerChange = (event) => {
     setSelectedAnswer(event.target.value);
@@ -80,19 +92,25 @@ function App() {
       // If the current question is level 5, then the next question must be level 5 and not visited.
       // Else, the next question must be the current level + 1 and not visited.
       if (currentLevel === 5) {
-        return potentialQuestionLevel === 5 && !visitedQuestions.current.includes(question);
+        return potentialQuestionLevel === 5
+          && !visitedQuestions.current.includes(question);
       } else {
         // Next question can be either the current level, or the next level
-        return (potentialQuestionLevel === currentLevel + 1 || potentialQuestionLevel === currentLevel)  && !visitedQuestions.current.includes(question);
+        return (potentialQuestionLevel === currentLevel + 1
+          || potentialQuestionLevel === currentLevel)
+          && !visitedQuestions.current.includes(question);
       }
     } else {
       // If the current question is level 1, then the next question must be level 1 and not visited.
       // Else, the next question must be the previous level and not visited.
       if (currentLevel === 1) {
-        return potentialQuestionLevel === 1 && !visitedQuestions.current.includes(question);
+        return potentialQuestionLevel === 1
+          && !visitedQuestions.current.includes(question);
       } else {
         // Next question can be either the current level, or the previous level
-        return (potentialQuestionLevel === currentLevel - 1 || potentialQuestionLevel === currentLevel) && !visitedQuestions.current.includes(question);
+        return (potentialQuestionLevel === currentLevel - 1
+          || potentialQuestionLevel === currentLevel)
+          && !visitedQuestions.current.includes(question);
       }
     }
   }
@@ -111,81 +129,28 @@ function App() {
 
   // Reset the quiz
   const handlePlayAgainClick = () => {
-    visitedQuestions.current = [];
-    setPoints(0);
-    setTotalPoints(0);
-    setCount(0);
-    setShowPoints(false);
     window.location.reload();
   };
 
   if (showPoints) {
     return (
-      <div class='result'>
-        <h2>Quiz Results</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Topic</th>
-              <th>Level</th>
-              <th>C/W</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visitedQuestions.current.map((q , index) => (
-              <tr key={q.q}>
-                <td>{q.topic}</td>
-                <td>{q.level}</td>
-                <td>{useranswers.current[index] ? "Correct" : "Wrong"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <p>
-          You got {points} out of {totalPoints} points.
-        </p>
-        <button class='playagain' onClick={handlePlayAgainClick}>Play Again</button>
-      </div>
+      <ResultsTable
+        visitedQuestions={visitedQuestions.current}
+        userAnswers={useranswers.current}
+        userPoints={points}
+        totalPoints={totalPoints}
+        handlePlayAgainClick={handlePlayAgainClick} />
     );
   }
 
   return (
-    <div>
-      <p>Question {count} out of 10</p>
-      {currentQuestion && (
-        <div key={currentQuestion.q}>
-          <p>{currentQuestion.a}</p>
-          <p>{currentQuestion.topic}</p>
-          <h2 class='ques'>
-            Q:{currentQuestion.q} (level: {currentQuestion.level})
-          </h2>
-          {/* <h3>a:{currentQuestion.a}</h3> */}
-          <ul class='options'
-            style={{ listStyle: "none", padding: 10 }}>
-            {Array.isArray(currentQuestion.answers) &&
-              currentQuestion.answers.map((answer) => (
-                <li key={answer}>
-                  <label>
-                    <input
-                      type="radio"
-                      name="answer"
-                      value={answer}
-                      checked={selectedAnswer === answer}
-                      onChange={handleAnswerChange}
-                    />
-                    {answer}
-                  </label>
-                </li>
-              ))}
-          </ul>
-
-        </div>
-      )}
-      <button class='next' type="button" onClick={handleNextButtonClick}>
-        next
-      </button>
-    </div>
+    <QuizQuestion
+      count={count}
+      currentQuestion={currentQuestion}
+      selectedAnswer={selectedAnswer}
+      handleAnswerChange={handleAnswerChange}
+      handleNextButtonClick={handleNextButtonClick}
+    />
   );
 }
 
